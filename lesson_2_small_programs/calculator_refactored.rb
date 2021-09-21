@@ -3,14 +3,14 @@
 # perform the operation on the two numbers
 # output the result
 
-#Add prefix to prompt
+# Add prefix to prompt
 def prompt(message)
   puts "=> #{message}"
 end
 
-
 # Number validation
-# 'string'.to_i => 0 (This also stops '0' as input, but we'll deal with that later)
+# 'string'.to_i => 0 (This also stops '0' as input, but we'll deal
+# with that later)
 def valid_number?(num)
   num.to_i != 0
 end
@@ -45,8 +45,8 @@ end
 prompt "Hi #{name}!"
 
 loop do # Main loop
-
-  # Since we created a new scope with the loop block, we need to initialize the variables outside of the block
+  # Since we created a new scope with the loop block, we need to initialize
+  # the variables outside of the block
   number1 = ''
   # Loop until number is valid
   loop do
@@ -59,7 +59,6 @@ loop do # Main loop
       prompt "That's not a valid number, try again."
     end
   end
-
 
   number2 = ''
   loop do
@@ -88,7 +87,7 @@ loop do # Main loop
   operator = ''
   loop do
     operator = gets.chomp
-
+    binding.pry
     if %w(1 2 3 4).include?(operator)
       break
     else
@@ -101,22 +100,23 @@ loop do # Main loop
   prompt "#{operation_to_message(operator)} the two numbers..."
 
   # Use case statement instead of if/else (I already did this)
-  result = case operator
-          when '1'
-            number1.to_f + number2.to_f
-          when '2'
-            number1.to_f - number2.to_f
-          when '3'
-            number1.to_f * number2.to_f
-          when '4'
-            unless number2.to_f == 0
-              number1.to_f / number2.to_f
-            else
-              "Cannot divide by 0, please try again"
-            end
-          else
-            "Invalid input, please try again"
-          end
+  result =
+    case operator
+    when '1'
+      number1.to_f + number2.to_f
+    when '2'
+      number1.to_f - number2.to_f
+    when '3'
+      number1.to_f * number2.to_f
+    when '4'
+      if number2.to_f == 0
+        "Cannot divide by 0, please try again"
+      else
+        number1.to_f / number2.to_f
+      end
+    else
+      "Invalid input, please try again"
+    end
 
   prompt "The result is #{result}!"
 
