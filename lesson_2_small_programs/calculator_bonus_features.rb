@@ -1,4 +1,7 @@
-require "pry"
+require 'yaml'
+MESSAGES = YAML.load_file('calc_messages_en.yml')
+# puts MESSAGES.inspect
+
 # ask the user for two numbers
 # ask the user for an operation to perform
 # perform the operation on the two numbers
@@ -56,19 +59,19 @@ def operation_to_message(op)
   msg =
     case op
     when '1'
-      'Adding'
+      MESSAGES['adding']
     when '2'
-      'Subtracting'
+      MESSAGES['subtracting']
     when '3'
-      'Multiplying'
+      MESSAGES['multiplying']
     when '4'
-      'Dividing'
+      MESSAGES['dividing']
     end
   # More code can go here...
   msg
 end
 
-prompt 'Welcome to Calculator! Enter your name:'
+prompt MESSAGES['welcome']
 
 # Ask for name outside main loop (don't want to ask this every time)
 name = ''
@@ -76,12 +79,12 @@ loop do
   name = gets.chomp
 
   if name.empty?
-    prompt "Make sure to use a valid name"
+    prompt MESSAGES['use_valid_name']
   else break
   end
 end
 
-prompt "Hi #{name}!"
+prompt MESSAGES['greeting'] + name + '!'
 
 loop do # Main loop
   # Since we created a new scope with the loop block, we need to initialize
@@ -89,38 +92,33 @@ loop do # Main loop
   number1 = ''
   # Loop until number is valid
   loop do
-    prompt "What's the first number?"
+    prompt MESSAGES['first_number']
     number1 = gets.chomp
 
     if number?(number1)
       break
     else
-      prompt "That's not a valid number, try again."
+      prompt MESSAGES['not_valid_number']
     end
   end
 
   number2 = ''
   loop do
-    prompt "What's the second number?"
+    prompt MESSAGES['second_number']
     number2 = gets.chomp
 
     if number?(number2)
       break
     else
-      prompt "That's not a valid number, try again."
+      prompt MESSAGES['not_valid_number']
     end
   end
 
-  # Write multiline strings
-  operator_prompt = <<-MSG # three arbitrary letters as delimeters, must match
-    Which operation would you like me to perform?
-    1) add
-    2) subtract
-    3) multiply
-    4) divide
-    MSG
-
-  prompt operator_prompt
+  prompt MESSAGES['operator_prompt']
+  puts MESSAGES['operator_add']
+  puts MESSAGES['operator_subtract']
+  puts MESSAGES['operator_multiply']
+  puts MESSAGES['operator_divide']
 
   # Loop until valid operator
   operator = ''
@@ -128,16 +126,16 @@ loop do # Main loop
     operator = gets.chomp
 
     if operator == '4' && number2.to_f == 0
-      prompt "Cannot divide by 0, please choose another operation:"
+      prompt MESSAGES['zero_division_error']
     elsif %w(1 2 3 4).include?(operator)
       break
     else
-      prompt "Please choose 1, 2, 3, or 4:"
+      prompt MESSAGES['choose_1_to_4']
     end
   end
 
   # Operator confirmation
-  prompt "#{operation_to_message(operator)} the two numbers..."
+  prompt operation_to_message(operator) + MESSAGES['the_two_numbers']
 
   # Operator validation
   result =
@@ -152,11 +150,11 @@ loop do # Main loop
       number1.to_f / number2.to_f
     end
 
-  prompt "The result is #{result}!"
+  prompt MESSAGES['result_is'] + result.to_s + '!'
 
-  prompt "Do you want to perform another calculation? (Y/N):"
+  prompt MESSAGES['again']
   answer = gets.chomp
-  break unless answer.downcase.start_with?('y')
+  break unless answer.downcase.start_with?(MESSAGES['affirmative'])
 end
 
-prompt "Thank you for using the calculator, #{name}. Good bye!"
+prompt MESSAGES['thank_you'] + name + '!' + MESSAGES['bye']
