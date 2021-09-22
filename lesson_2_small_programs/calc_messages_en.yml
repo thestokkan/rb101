@@ -11,13 +11,11 @@ greeting: 'Hi '
 first_number: "What's the first number?"
 second_number: "What's the second number?"
 not_valid_number: "That's not a valid number, try again."
-operator_prompt: '<<-MSG
-  Which operation would you like me to perform?
-  1) add
-  2) subtract
-  3) multiply
-  4) divide
-MSG'
+operator_prompt: 'Which operation would you like me to perform?'
+operator_add: '   1) add'
+operator_subtract: '   2) subtract'
+operator_multiply: '   3) multiply'
+operator_divide: '   4) divide'
 zero_division_error: 'Cannot divide by 0, please choose another operation:'
 choose_1_to_4: "Please choose 1, 2, 3, or 4:"
 the_two_numbers: " the two numbers..."
@@ -25,4 +23,4 @@ result_is: 'The result is '
 again: 'Do you want to perform another calculation? (Y/N):'
 affirmative: 'y'
 thank_you: 'Thank you for using the calculator, '
-bye: 'Good bye!'
+bye: ' Good bye!'

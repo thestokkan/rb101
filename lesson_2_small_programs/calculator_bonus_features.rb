@@ -59,13 +59,13 @@ def operation_to_message(op)
   msg =
     case op
     when '1'
-      adding
+      MESSAGES['adding']
     when '2'
-      subtracting
+      MESSAGES['subtracting']
     when '3'
-      multiplying
+      MESSAGES['multiplying']
     when '4'
-      dividing
+      MESSAGES['dividing']
     end
   # More code can go here...
   msg
@@ -79,7 +79,7 @@ loop do
   name = gets.chomp
 
   if name.empty?
-    prompt use_valid_name
+    prompt MESSAGES['use_valid_name']
   else break
   end
 end
@@ -92,30 +92,33 @@ loop do # Main loop
   number1 = ''
   # Loop until number is valid
   loop do
-    prompt first_number
+    prompt MESSAGES['first_number']
     number1 = gets.chomp
 
     if number?(number1)
       break
     else
-      prompt not_valid_number
+      prompt MESSAGES['not_valid_number']
     end
   end
 
   number2 = ''
   loop do
-    prompt second_number
+    prompt MESSAGES['second_number']
     number2 = gets.chomp
 
     if number?(number2)
       break
     else
-      prompt not_valid_number
+      prompt MESSAGES['not_valid_number']
     end
   end
 
-
-  prompt operator_prompt
+  prompt MESSAGES['operator_prompt']
+  puts MESSAGES['operator_add']
+  puts MESSAGES['operator_subtract']
+  puts MESSAGES['operator_multiply']
+  puts MESSAGES['operator_divide']
 
   # Loop until valid operator
   operator = ''
@@ -123,16 +126,16 @@ loop do # Main loop
     operator = gets.chomp
 
     if operator == '4' && number2.to_f == 0
-      prompt zero_division_error
+      prompt MESSAGES['zero_division_error']
     elsif %w(1 2 3 4).include?(operator)
       break
     else
-      prompt choose_1_to_4
+      prompt MESSAGES['choose_1_to_4']
     end
   end
 
   # Operator confirmation
-  prompt operation_to_message(operator) + the_two_numbers
+  prompt operation_to_message(operator) + MESSAGES['the_two_numbers']
 
   # Operator validation
   result =
@@ -147,11 +150,11 @@ loop do # Main loop
       number1.to_f / number2.to_f
     end
 
-  prompt result_is + result + '!'
+  prompt MESSAGES['result_is'] + result.to_s + '!'
 
-  prompt again
+  prompt MESSAGES['again']
   answer = gets.chomp
-  break unless answer.downcase.start_with?(affirmative)
+  break unless answer.downcase.start_with?(MESSAGES['affirmative'])
 end
 
-prompt thank_you + name + bye
+prompt MESSAGES['thank_you'] + name + '!' + MESSAGES['bye']
