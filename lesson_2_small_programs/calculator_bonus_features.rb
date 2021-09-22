@@ -1,7 +1,3 @@
-require 'yaml'
-MESSAGES = YAML.load_file('calc_messages_en.yml')
-# puts MESSAGES.inspect
-
 # ask the user for two numbers
 # ask the user for an operation to perform
 # perform the operation on the two numbers
@@ -13,10 +9,32 @@ MESSAGES = YAML.load_file('calc_messages_en.yml')
 # 3. Make case statement more robust (done)
 # 4. Extract messages to config file
 # 5. Internationalize calculator
+require 'yaml'
 
 # Add prefix to prompt
 def prompt(message)
   puts "=> #{message}"
+end
+
+# Pick language
+prompt "Please choose language:"
+puts "   1) English"
+puts "   2) Norsk"
+
+language = ''
+
+loop do
+  language = gets.chomp
+  break if %w[1 2].include?(language)
+  prompt "Please choose 1 or 2:"
+end
+
+# Load appropriate language file
+case language
+when '1'
+  MESSAGES = YAML.load_file('calc_messages_en.yml')
+when '2'
+  MESSAGES = YAML.load_file('calc_messages_no.yml')
 end
 
 # Integer validation (not in use, see Number validation below)

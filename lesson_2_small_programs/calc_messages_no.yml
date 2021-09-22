@@ -1,0 +1,26 @@
+# Messages for calculator_bonus_features.rb
+# ENGLISH
+
+adding: 'Adderer'
+subtracting: 'Subtaherer'
+multiplying: 'Multipliserer'
+dividing: 'Dividerer'
+welcome: 'Velkommen til Kalkulator! Skriv inn navnet ditt:'
+use_valid_name: 'Vennligst skriv et gyldig navn:'
+greeting: 'Hei '
+first_number: "Hva er det første tallet?"
+second_number: "Hva er det andre tallet?"
+not_valid_number: "Det er ikke et gyldig tall. Prøv igjen:"
+operator_prompt: 'Hvilken operasjon vil du jeg skal utføre?'
+operator_add: '   1) addere'
+operator_subtract: '   2) subtrahere'
+operator_multiply: '   3) multiplisere'
+operator_divide: '   4) dividere'
+zero_division_error: 'Kan ikke dele på 0, vennligst velg en annen operasjon:'
+choose_1_to_4: "Vennligst velg 1, 2, 3, eller 4:"
+the_two_numbers: " de to tallene..."
+result_is: 'Resultatet er '
+again: 'En gang til? (J/N):'
+affirmative: 'j'
+thank_you: 'Takk for at du brukte Kalkulator, '
+bye: ' Hadet!'
