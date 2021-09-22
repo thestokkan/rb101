@@ -37,40 +37,28 @@ when '2'
   MESSAGES = YAML.load_file('calc_messages_no.yml')
 end
 
-# Integer validation (not in use, see Number validation below)
-def valid_number?(num)
-  num.to_i.to_s == num
+# Integer validation using regex
+# #match returns MatchData object or nil
+def integer?(num)
+  /^-?\d*$/.match(num) ? true : false
 end
 
-# Number validation (integer and floats)
+# Number validation (combine integer and float validation)
 #   Tricky edge cases:
 #   1. `num.to_f` will return numbers in scientific notation
 #   for |1e-5| >= num >+ |1e15|
 #   2. `num.to_i` will return `0` for num <= 0.00001
 #   3. `num.to_f.to_s == num` will return 'false' for `num = 0`
-def number?(num)
-  if num.include?('.')
-    if num.to_f == 0
-      num.to_f.to_s == num
-    else
-      num.to_f / num.to_f == 1.0
-    end
-  else
-    num.to_i.to_s == num
-  end
+
+# Float validation regex
+# #match returns MatchData object or nil
+def float?(num)
+  /\d/.match(num) && /^-?\d*\.?\d*$/.match(num) ? true : false
 end
 
-# # Tests
-# puts number?('a')
-# puts number?('/')
-# puts number?('0')
-# puts number?('0.0')
-# puts number?('100')
-# puts number?('-100')
-# puts number?('100000000000000000000000000000000000')
-# puts number?('100000000000000000000000000000000000.0')
-# puts number?('0.000000000000000000000000000000000001')
-# puts number?('-0.000000000000000000000000000000000001')
+def number?(num)
+  integer?(num) || float?(num)
+end
 
 # Convert prompt input back into words
 def operation_to_message(op)
