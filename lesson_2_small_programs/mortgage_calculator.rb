@@ -29,9 +29,9 @@
 # 25000, 6, 15 -> 180, 0.5%, $210.96
 # 10000, 2, 8 -> 96, 0.2%, $112.81
 # 10000, 0, 8 -> 96, 0.0%, $104.17
-# Loan amont outside range (1..30) -> error message, try again
-# Any input <= 0 -> error message, try again
-# Any non-number (float or integer) input -> error message, try again
+# Loan duration outside range (1..30) or not Integer -> error message, try again
+# Loan amount and/or APR not Float or Integer -> error message, try again
+# Loan amount and/or APR < 0 -> error message, try again
 
 # ALGORITHM
 # 1. Define methods
@@ -75,16 +75,16 @@
 # CODE
 
 # 1. Define methods
-def integer?(num)
+def positive_integer?(num)
   /^\d*$/.match(num) ? true : false
 end
 
-def float?(num)
-  /^\d/.match(num) && /\d*\.?\d*$/.match(num) ? true : false
+def positive_float?(num)
+  /\d/.match(num) && /^\d*\.?\d*$/.match(num) ? true : false
 end
 
 def positive_number?(num)
-  (integer?(num) || float?(num))
+  (positive_integer?(num) || positive_float?(num))
 end
 
 def prompt(message)
@@ -123,32 +123,32 @@ loop do # main loop
     print ">> "
     duration = gets.chomp
 
-    break if integer?(duration) && (1..30).include?(duration.to_i)
+    break if positive_integer?(duration) && (1..30).include?(duration.to_i)
     prompt "Please provide a valid number"
   end
 
   # 4. Perform calculations
   payment_periods = duration.to_i * 12
   monthly_rate = apr.to_f / 12 / 100
-
+  amount = amount.to_f
   if apr.to_f == 0
-    monthly_payment = amount.to_f / payment_periods
+    monthly_payment = amount / payment_periods
   else
     monthly_payment =
-      amount.to_f * (monthly_rate / (1 - (1 + monthly_rate)**(-payment_periods)))
+      amount * (monthly_rate / (1 - (1 + monthly_rate)**(-payment_periods)))
   end
 
   # 5. Print results
   puts ">> "
   prompt "Your input"
-  prompt "  Loan amount: $#{sprintf("%.2f", amount.to_f)}"
-  prompt "  Annual percentage rate: #{sprintf("%.1f", apr.to_f)}%"
+  prompt "  Loan amount: $#{sprintf('%.2f', amount.to_f)}"
+  prompt "  Annual percentage rate: #{sprintf('%.1f', apr.to_f)}%"
   prompt "  Loan duration: #{duration.to_i} years"
 
   prompt "Your results"
   prompt "  Payment periods: #{payment_periods}"
-  prompt "  Monthly interest rate: #{sprintf("%.1f", (monthly_rate * 100))}%"
-  prompt "  Monthly payment: $#{sprintf("%.2f", monthly_payment)}"
+  prompt "  Monthly interest rate: #{sprintf('%.1f', (monthly_rate * 100))}%"
+  prompt "  Monthly payment: $#{sprintf('%.2f', monthly_payment)}"
 
   # Ask if user wants to do another calculation. If not, exit program.
   puts ">> "
