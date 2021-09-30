@@ -1,81 +1,162 @@
-# You'll need three pieces of information:
-#
-#     the loan amount
-#     the Annual Percentage Rate (APR)
-#     the loan duration
-#
-# From the above, you'll need to calculate the following things:
-#
-#     monthly interest rate
-#     loan duration in months
-#     monthly payment
-#
-# You can use the following formula:
-# m = p * (j / (1 - (1 + j)**(-n)))
-#
-#
-#     m = monthly payment
-#     p = loan amount
-#     j = monthly interest rate
-#     n = loan duration in months
-#
-# When you write your program, don't use the single-letter variables m, p, j, and n; use explicit names. For instance, you may want to use amount instead of p.
-#
-# Finally, don't forget to run your code through Rubocop.
-#
-# Hints:
-#
-#     Figure out what format your inputs need to be in. For example, should the interest rate be expressed as 5 or .05, if you mean 5% interest?
-#     If you're working with Annual Percentage Rate (APR), you'll need to convert that to a monthly interest rate.
-#     Be careful about the loan duration -- are you working with months or years? Choose variable names carefully to assist in remembering.
-#     You can use this loan calculator to check your results.
+# PE(D)AC
 
-# PEDA
-# Processing the problem
+# PROCESSING THE PROBLEM
 
 # input
 # - amount: integer (number of dollars)
-# - annual_percentage_rate (APR): integer (5% -> 5)
-# - loan_duration_years: integer (number of years)
+# - apr (APR): integer (5% -> 5)
+# - duration: integer (number of years)
 
 # output
 # - monthly_percentage_rate: integer (5% -> 5)
 # - payment_periods (loan duration months): integer
 # - monthly_payment: float (number of dollars)
 
-# Examples/edge cases
-# amount = 25000
-# annual_percentage_rate = 5
-# loan_duration_years = 30
-# => monthly_percentage_rate =
-# => payment_periods = 360
-# => monthly_payment = 134.21
+# Rules/clarifications/questions:
+# - Monthly interest rate is APR / 12
+# - If APR = 0, monthly payment is loan amount / payment periods
+# - In the monthly_payment calculation, the monthly_rate must be expressed as
+#   decimal (e.g. 5% -> 0.05) -> need to convert input for calculations
+# - Constraints on input
+#   - Loan amount: positive number
+#   - Loan duration: Integer between 1 and 30
+#   - APR: positive number
+# - Extract messages to separate file? -> No, not for now
 
-# Constraints on loan duration and/or interest rate? -> NO
-# Allow loan_duration_years entered as float? -> NO, only full years (for now)
+# EXAMPLES/EDGE CASES
+# Loan amount, APR, duration -> Payment periods, monthly rate, monthly payment
+# 5000, 5, 20 -> 240, 0.4%, $33.00
+# 25000, 6, 15 -> 180, 0.5%, $210.96
+# 10000, 2, 8 -> 96, 0.2%, $112.81
+# 10000, 0, 8 -> 96, 0.0%, $104.17
+# Loan amont outside range (1..30) -> error message, try again
+# Any input <= 0 -> error message, try again
+# Any non-number (float or integer) input -> error message, try again
 
-# Algorithm
-# Given amount, loan_duration_years, and annual_percentage_rate:
-# 1. Calculate the total number of payments (payment_periods)
-#   -  loan_duration_years * 12
-# 2. Calculate monthly_percentage_rate
-#   - annual_percentage_rate / 12
-# 3. Calculate monthly_payment
-#   - see above
-# Print the above results
+# ALGORITHM
+# 1. Define methods
+#   - Number validation
+#     - Integer validation
+#     - Float validation
+#     - Positive number
+#   - Prompt styling
+# 2. Welcome user
+# 3. Get user input
+#   (loan amount, annual percentage rate, and loan duration in years.)
+#   - For each input:
+#     - Initiate user input variable
+#     - Within a loop, prompt user for input
+#     - Convert input to Integer
+#     - validate input
+#       - for amount and APR: Positive number
+#       - for duration: Integer between 1 and 30
+#     - exit loop when input is validated, otherwise prompt again
+#
+# 4. Perform calculations
+#   Given amount, duration, and APR:
+#   1. Calculate the payment_periods (total number of months)
+#     -  duration * 12
+#   2. Calculate monthly_percentage_rate
+#     - apr / 12
+#   3. Calculate monthly_payment
+#     - If APR == 0: m = p / n
+#     - Otherwise: m = p * (j / (1 - (1 + j)**(-n)))
+#       m = monthly payment
+#       p = loan amount
+#       j = monthly interest rate (as decimal number)
+#       n = loan duration in months
+#
+# 5. Print the user's input and then the following results:
+#    monthly interest rate, payment periods, and monthly payments.
+#
+# 6. Ask if user wants to perform another calculation.
+#   - If not, print a 'goodbye' message and exit program
 
+# CODE
 
-def mortgage_calc(amount, annual_percentage_rate, loan_duration_years)
-  payment_periods = loan_duration_years * 12
-  monthly_percentage_rate = annual_percentage_rate.to_f / 12
-  monthly_payment = amount.to_f *
-                    (monthly_percentage_rate /
-                    (1 - (1 + monthly_percentage_rate)**(-payment_periods)))
-
-  puts "Payment periods: #{payment_periods}"
-  puts "Monthly interest rate: #{monthly_percentage_rate.round(2)}%"
-  puts "Monthly payment: $#{monthly_payment.round(2)}"
+# 1. Define methods
+def integer?(num)
+  /^\d*$/.match(num) ? true : false
 end
 
+def float?(num)
+  /^\d/.match(num) && /\d*\.?\d*$/.match(num) ? true : false
+end
 
-mortgage_calc(5000, 5, 20)
+def positive_number?(num)
+  (integer?(num) || float?(num))
+end
+
+def prompt(message)
+  puts ">> #{message}"
+end
+
+# 2. Welcome user
+prompt 'Welcome to Mortgage Calculator!'
+prompt 'Please provide the following details'
+
+loop do # main loop
+  # 3. Get user input (loop until valid)
+  amount = ''
+  loop do
+    prompt "Loan amount in dollars: "
+    print ">> "
+    amount = gets.chomp
+
+    break if positive_number?(amount)
+    prompt "Please provide a valid number"
+  end
+
+  apr = ''
+  loop do
+    prompt "Annual percentage rate: "
+    print ">> "
+    apr = gets.chomp
+
+    break if positive_number?(apr)
+    prompt "Please provide a valid number"
+  end
+
+  duration = ''
+  loop do
+    prompt "Loan duration in years (1-30): "
+    print ">> "
+    duration = gets.chomp
+
+    break if integer?(duration) && (1..30).include?(duration.to_i)
+    prompt "Please provide a valid number"
+  end
+
+  # 4. Perform calculations
+  payment_periods = duration.to_i * 12
+  monthly_rate = apr.to_f / 12 / 100
+
+  if apr.to_f == 0
+    monthly_payment = amount.to_f / payment_periods
+  else
+    monthly_payment =
+      amount.to_f * (monthly_rate / (1 - (1 + monthly_rate)**(-payment_periods)))
+  end
+
+  # 5. Print results
+  puts ">> "
+  prompt "Your input"
+  prompt "  Loan amount: $#{sprintf("%.2f", amount.to_f)}"
+  prompt "  Annual percentage rate: #{sprintf("%.1f", apr.to_f)}%"
+  prompt "  Loan duration: #{duration.to_i} years"
+
+  prompt "Your results"
+  prompt "  Payment periods: #{payment_periods}"
+  prompt "  Monthly interest rate: #{sprintf("%.1f", (monthly_rate * 100))}%"
+  prompt "  Monthly payment: $#{sprintf("%.2f", monthly_payment)}"
+
+  # Ask if user wants to do another calculation. If not, exit program.
+  puts ">> "
+  prompt "Would you like to perform another calculation? (y/n)"
+  print ">> "
+  answer = gets.chomp.downcase
+
+  break unless answer.start_with?('y')
+end
+
+prompt "Thank you for using Mortgage Calculator! Goodbye!"
