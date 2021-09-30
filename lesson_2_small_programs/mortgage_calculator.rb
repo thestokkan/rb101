@@ -141,14 +141,14 @@ loop do # main loop
   # 5. Print results
   puts ">> "
   prompt "Your input"
-  prompt "  Loan amount: $#{sprintf('%.2f', amount.to_f)}"
-  prompt "  Annual percentage rate: #{sprintf('%.1f', apr.to_f)}%"
+  prompt "  Loan amount: $#{format('%.2f', amount.to_f)}"
+  prompt "  Annual percentage rate: #{format('%.1f', apr.to_f)}%"
   prompt "  Loan duration: #{duration.to_i} years"
 
   prompt "Your results"
   prompt "  Payment periods: #{payment_periods}"
-  prompt "  Monthly interest rate: #{sprintf('%.1f', (monthly_rate * 100))}%"
-  prompt "  Monthly payment: $#{sprintf('%.2f', monthly_payment)}"
+  prompt "  Monthly interest rate: #{format('%.1f', (monthly_rate * 100))}%"
+  prompt "  Monthly payment: $#{format('%.2f', monthly_payment)}"
 
   # Ask if user wants to do another calculation. If not, exit program.
   puts ">> "
