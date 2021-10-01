@@ -40,6 +40,7 @@
 #     - Float validation
 #     - Positive number
 #   - Prompt styling
+#   - User input
 # 2. Welcome user
 # 3. Get user input
 #   (loan amount, annual percentage rate, and loan duration in years.)
@@ -74,21 +75,43 @@
 
 # CODE
 
-# 1. Define methods
-def positive_integer?(num)
+# 1. Define constants and methods
+DURATION_RANGE = (1..30)
+MONTHS_IN_A_YEAR = 12
+
+def pos_integer?(num)
   /^\d*$/.match(num) ? true : false
 end
 
-def positive_float?(num)
+def pos_float?(num)
   /\d/.match(num) && /^\d*\.?\d*$/.match(num) ? true : false
 end
 
-def positive_number?(num)
-  (positive_integer?(num) || positive_float?(num))
+def pos_number?(num)
+  (pos_integer?(num) || pos_float?(num))
 end
 
 def prompt(message)
   puts ">> #{message}"
+end
+
+# Get user input (loop until valid)
+def user_input(message, input_type = '')
+  input = ''
+  loop do
+    prompt message
+    print ">> "
+    input = gets.chomp
+
+    if input_type == 'duration'
+      valid_input = pos_integer?(input) && DURATION_RANGE.include?(input.to_i)
+    else
+      valid_input = pos_number?(input)
+    end
+    break if valid_input
+    prompt "Please provide a valid number"
+  end
+  input
 end
 
 # 2. Welcome user
@@ -96,40 +119,14 @@ prompt 'Welcome to Mortgage Calculator!'
 prompt 'Please provide the following details'
 
 loop do # main loop
-  # 3. Get user input (loop until valid)
-  amount = ''
-  loop do
-    prompt "Loan amount in dollars: "
-    print ">> "
-    amount = gets.chomp
-
-    break if positive_number?(amount)
-    prompt "Please provide a valid number"
-  end
-
-  apr = ''
-  loop do
-    prompt "Annual percentage rate: "
-    print ">> "
-    apr = gets.chomp
-
-    break if positive_number?(apr)
-    prompt "Please provide a valid number"
-  end
-
-  duration = ''
-  loop do
-    prompt "Loan duration in years (1-30): "
-    print ">> "
-    duration = gets.chomp
-
-    break if positive_integer?(duration) && (1..30).include?(duration.to_i)
-    prompt "Please provide a valid number"
-  end
+  # 3. Get user input
+  amount = user_input("Loan amount in dollars: ")
+  apr = user_input("Annual percentage rate: ")
+  duration = user_input("Loan duration in years (1-30): ", 'duration')
 
   # 4. Perform calculations
-  payment_periods = duration.to_i * 12
-  monthly_rate = apr.to_f / 12 / 100
+  payment_periods = duration.to_i * MONTHS_IN_A_YEAR
+  monthly_rate = apr.to_f / MONTHS_IN_A_YEAR / 100
   amount = amount.to_f
   if apr.to_f == 0
     monthly_payment = amount / payment_periods
@@ -156,7 +153,7 @@ loop do # main loop
   print ">> "
   answer = gets.chomp.downcase
 
-  break unless answer.start_with?('y')
+  break unless ['y', 'yes'].include?(answer)
 end
 
 prompt "Thank you for using Mortgage Calculator! Goodbye!"
