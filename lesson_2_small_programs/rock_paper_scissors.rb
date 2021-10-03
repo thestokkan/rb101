@@ -68,16 +68,15 @@
 # Print personalized 'goodbye' message
 
 # CODE
-
 def prompt(message)
   puts ">> #{message}"
 end
 
 choice_prompt = <<-MSG
->> Please make your choice (1-3):
-  >>  1) rock
-  >>  2) paper
-  >>  3) scissors
+>> Make your choice (1-3):
+>>  1) rock
+>>  2) paper
+>>  3) scissors
   MSG
 
 def integer?(num)
@@ -87,6 +86,20 @@ end
 def valid_input?(input)
   integer?(input) && (1..3).include?(input.to_i)
 end
+
+# Choice translation
+def choice_to_word(input)
+  choice_word = case input
+              when '1'
+                'ROCK'
+              when '2'
+                'PAPER'
+              when '3'
+                'SCISSORS'
+              end
+  choice_word
+end
+
 
 def winner(choices)
   # Placeholder code
@@ -103,12 +116,17 @@ loop do
   break unless name.empty?
 end
 
-puts '>>'
-prompt "Let's play, #{name}!"
+LINE_LENGTH = name.length + 30
+LINE = '-' * LINE_LENGTH
+
+puts '', LINE
+puts ">>>>> Let's play, #{name}! <<<<<".center(LINE_LENGTH)
+puts LINE, ''
 
 loop do # main loop
-
   choices = {user: '', computer: ''}
+
+  # User choice
   loop do
     puts choice_prompt
     print '>> '
@@ -117,14 +135,40 @@ loop do # main loop
     prompt "Invalid input..."
   end
 
-  choices[:computer] = [1, 2, 3].sample
+  # Computer 'choice'
+  choices[:computer] = %w(1 2 3).sample
+  choice_user = choice_to_word(choices[:user])
+  choice_computer = choice_to_word(choices[:computer])
 
-  puts winner(choices)
+  # Print results
+  puts ''
+  puts 'RESULTS'.center(LINE_LENGTH)
+  print name
+  puts 'Computer'.rjust(LINE_LENGTH - name.length)
+  puts LINE
+  print choice_user
+  puts choice_computer.rjust(LINE_LENGTH - choice_user.length)
+  puts LINE
 
+  winner = winner(choices)
+
+  if winner == :user
+    prompt "Congratulations, you won!"
+  elsif winner == :computer
+    prompt "Sorry, you were outsmarted by a computer."
+  else
+    prompt "It's a draw!"
+  end
+
+  # Prompt for another game
+  puts ">>"
   prompt "Want to have another go? (y/n)"
+  print ">> "
   answer = gets.chomp.downcase
 
   break unless ['y', 'yes'].include?(answer)
 end
 
-"Thanks for playing, #{name}!"
+puts '', LINE
+puts "Thanks for playing, #{name}!".center(LINE_LENGTH)
+puts LINE
