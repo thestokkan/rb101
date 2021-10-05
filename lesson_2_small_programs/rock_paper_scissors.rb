@@ -100,10 +100,40 @@ def choice_to_word(input)
   choice_word
 end
 
-
 def winner(choices)
-  # Placeholder code
-  choices.keys.sample
+  winner = ''
+  message =  "It's a draw!"
+  msg1 = 'PAPER beats ROCK!'
+  msg2 = 'ROCK beats SCISSORS!'
+  msg3 = 'SCISSORS beat PAPER!'
+
+  case choices[:user]
+  when 'ROCK'
+    if choices[:computer] == 'PAPER'
+      winner = :computer
+      message = msg1
+    elsif choices[:computer] == 'SCISSORS'
+      winner = :user
+      message = msg2
+    end
+  when 'PAPER'
+    if choices[:computer] == 'SCISSORS'
+      winner = :computer
+      message = msg3
+    elsif choices[:computer] == 'ROCK'
+      winner = :user
+      message = msg1
+    end
+  when 'SCISSORS'
+    if choices[:computer] == 'ROCK'
+      winner = :computer
+      message = msg2
+    elsif choices[:computer] == 'PAPER'
+      winner = :user
+      message = msg3
+    end
+  end
+  results = [winner, message]
 end
 
 prompt "Welcome to Rock, paper, scissors!"
@@ -137,8 +167,8 @@ loop do # main loop
 
   # Computer 'choice'
   choices[:computer] = %w(1 2 3).sample
-  choice_user = choice_to_word(choices[:user])
-  choice_computer = choice_to_word(choices[:computer])
+  choices[:user] = choice_to_word(choices[:user])
+  choices[:computer] = choice_to_word(choices[:computer])
 
   # Print results
   puts ''
@@ -146,22 +176,23 @@ loop do # main loop
   print name
   puts 'Computer'.rjust(LINE_LENGTH - name.length)
   puts LINE
-  print choice_user
-  puts choice_computer.rjust(LINE_LENGTH - choice_user.length)
-  puts LINE
+  print choices[:user]
+  puts choices[:computer].rjust(LINE_LENGTH - choices[:user].length)
+  puts LINE, ''
 
-  winner = winner(choices)
+  results = winner(choices)
 
-  if winner == :user
-    prompt "Congratulations, you won!"
-  elsif winner == :computer
-    prompt "Sorry, you were outsmarted by a computer."
+  if results[0] == :user
+    puts results[1].center(LINE_LENGTH)
+    puts ">>> Congratulations, you won! <<<".center(LINE_LENGTH), ''
+  elsif results[0] == :computer
+    puts results[1].center(LINE_LENGTH)
+    puts "Sorry, you were outsmarted by a computer...".center(LINE_LENGTH), ''
   else
-    prompt "It's a draw!"
+    puts results[1].center(LINE_LENGTH), ''
   end
 
   # Prompt for another game
-  puts ">>"
   prompt "Want to have another go? (y/n)"
   print ">> "
   answer = gets.chomp.downcase
