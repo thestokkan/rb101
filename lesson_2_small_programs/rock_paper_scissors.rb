@@ -1,5 +1,6 @@
 # Assignment
-# In this assignment, we'll build a Rock Paper Scissors game. The game flow should go like this:
+# In this assignment, we'll build a Rock Paper Scissors game. The game flow
+# should go like this:
 #
 #     the user makes a choice
 #     the computer makes a choice
@@ -68,6 +69,9 @@
 # Print personalized 'goodbye' message
 
 # CODE
+# Clear terminal
+system("clear") || system("cls")
+
 def prompt(message)
   puts ">> #{message}"
 end
@@ -87,62 +91,41 @@ def valid_input?(input)
   integer?(input) && (1..3).include?(input.to_i)
 end
 
+rps = {
+  user: { choice: '', score: 0 },
+  computer: { choice: '', score: 0 }
+}
+
 # Choice translation
 def choice_to_word(input)
   choice_word = case input
-              when '1'
-                'ROCK'
-              when '2'
-                'PAPER'
-              when '3'
-                'SCISSORS'
-              end
+                when '1'
+                  'ROCK'
+                when '2'
+                  'PAPER'
+                when '3'
+                  'SCISSORS'
+                end
   choice_word
 end
 
-def winner(choices)
-  winner = ''
-  message =  "It's a draw!"
-  msg1 = 'PAPER beats ROCK!'
-  msg2 = 'ROCK beats SCISSORS!'
-  msg3 = 'SCISSORS beat PAPER!'
-
-  case choices[:user]
-  when 'ROCK'
-    if choices[:computer] == 'PAPER'
-      winner = :computer
-      message = msg1
-    elsif choices[:computer] == 'SCISSORS'
-      winner = :user
-      message = msg2
-    end
-  when 'PAPER'
-    if choices[:computer] == 'SCISSORS'
-      winner = :computer
-      message = msg3
-    elsif choices[:computer] == 'ROCK'
-      winner = :user
-      message = msg1
-    end
-  when 'SCISSORS'
-    if choices[:computer] == 'ROCK'
-      winner = :computer
-      message = msg2
-    elsif choices[:computer] == 'PAPER'
-      winner = :user
-      message = msg3
-    end
+def flash(msg)
+  5.times do
+    print "\r#{msg}"
+    sleep 0.4
+    print "\r#{' ' * msg.size}"
+    sleep 0.4
   end
-  results = [winner, message]
+  print "\r#{msg}\n\n\n"
 end
 
 prompt "Welcome to Rock, paper, scissors!"
 
 name = ''
 loop do
-    prompt 'Please enter your name:'
-    print '>> '
-    name = gets.chomp
+  prompt 'Please enter your name:'
+  print '>> '
+  name = gets.chomp
   break unless name.empty?
 end
 
@@ -153,44 +136,85 @@ puts '', LINE
 puts ">>>>> Let's play, #{name}! <<<<<".center(LINE_LENGTH)
 puts LINE, ''
 
-loop do # main loop
-  choices = {user: '', computer: ''}
+loop do # Main loop
+  user = rps[:user]
+  computer = rps[:computer]
 
   # User choice
   loop do
     puts choice_prompt
     print '>> '
-    choices[:user] = gets.chomp
-    break if valid_input?(choices[:user])
+    user[:choice] = gets.chomp
+    break if valid_input?(user[:choice])
     prompt "Invalid input..."
   end
 
   # Computer 'choice'
-  choices[:computer] = %w(1 2 3).sample
-  choices[:user] = choice_to_word(choices[:user])
-  choices[:computer] = choice_to_word(choices[:computer])
+  computer[:choice] = %w(1 2 3).sample
+  # Convert number input to words
+  user[:choice] = choice_to_word(user[:choice])
+  computer[:choice] = choice_to_word(computer[:choice])
+
+  # Calculate results
+  res_msg = "It's a draw!"
+  winner = ''
+  case rps[:user][:choice]
+  when 'ROCK'
+    if rps[:computer][:choice] == 'PAPER'
+      winner = rps[:computer]
+      res_msg = 'PAPER beats ROCK!'
+    elsif rps[:computer][:choice] == 'SCISSORS'
+      winner = rps[:user]
+      res_msg = 'ROCK beats SCISSORS!'
+    end
+  when 'PAPER'
+    if rps[:computer][:choice] == 'SCISSORS'
+      winner = rps[:computer]
+      res_msg = 'SCISSORS beat PAPER!'
+    elsif rps[:computer][:choice] == 'ROCK'
+      winner = rps[:user]
+      res_msg = 'PAPER beats ROCK!'
+    end
+  when 'SCISSORS'
+    if rps[:computer][:choice] == 'ROCK'
+      winner = rps[:computer]
+      res_msg = 'ROCK beats SCISSORS!'
+    elsif rps[:computer][:choice] == 'PAPER'
+      winner = rps[:user]
+      res_msg = 'SCISSORS beat PAPER!'
+    end
+  end
+
+  winner[:score] += 1 unless winner.empty?
+  results = { winner: rps.key(winner).to_s, message: res_msg }
 
   # Print results
-  puts ''
-  puts 'RESULTS'.center(LINE_LENGTH)
+  puts '', "RESULTS".center(LINE_LENGTH)
   print name
   puts 'Computer'.rjust(LINE_LENGTH - name.length)
   puts LINE
-  print choices[:user]
-  puts choices[:computer].rjust(LINE_LENGTH - choices[:user].length)
-  puts LINE, ''
+  print user[:choice]
+  puts computer[:choice].rjust(LINE_LENGTH - user[:choice].length), "\n\n"
 
-  results = winner(choices)
-
-  if results[0] == :user
-    puts results[1].center(LINE_LENGTH)
-    puts ">>> Congratulations, you won! <<<".center(LINE_LENGTH), ''
-  elsif results[0] == :computer
-    puts results[1].center(LINE_LENGTH)
-    puts "Sorry, you were outsmarted by a computer...".center(LINE_LENGTH), ''
+  if results[:winner] == 'user'
+    puts results[:message].center(LINE_LENGTH)
+    msg = ">>> YOU WIN! <<<".center(LINE_LENGTH)
+  elsif results[:winner] == 'computer'
+    puts results[:message].center(LINE_LENGTH)
+    msg = "YOU LOSE".center(LINE_LENGTH)
   else
-    puts results[1].center(LINE_LENGTH), ''
+    msg = results[:message].center(30)
   end
+
+  flash(msg)
+
+  puts 'SCORE'.center(LINE_LENGTH)
+  print name
+  puts 'Computer'.rjust(LINE_LENGTH - name.length)
+  puts LINE
+  print user[:score]
+  puts computer[:score].to_s.rjust(LINE_LENGTH - user[:score].to_s.length)
+  puts LINE, ''
 
   # Prompt for another game
   prompt "Want to have another go? (y/n)"
