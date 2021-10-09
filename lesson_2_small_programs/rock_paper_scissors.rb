@@ -167,20 +167,30 @@ def display_moves(name, res)
   puts "\n\n"
 end
 
-def display_results(moves, res)
+def get_winner(moves, res)
   player = res[:player]
   computer = res[:computer]
-
   if moves[player[:move].downcase.to_sym].include?(computer[:move])
-    player[:score] += 1
+    winner = res[:player]
+  elsif player[:move] == computer[:move]
+    winner = ''
+  else
+    winner = res[:computer]
+  end
+  winner
+end
+
+def display_results(winner, res)
+  player = res[:player]
+  computer = res[:computer]
+  if winner == player
     puts center("#{player[:move]} beats #{computer[:move]}!")
     flash(center(">>> YOU WIN! <<<"))
-  elsif player[:move] == computer[:move]
-    flash(center("It's a draw!"))
-  else
-    computer[:score] += 1
+  elsif winner == computer
     puts center("#{computer[:move]} beats #{player[:move]}!")
     flash(center("YOU LOSE"))
+  else
+    flash(center("It's a draw!"))
   end
 end
 
@@ -216,13 +226,19 @@ puts center(">>>>> Let's play, #{name}! <<<<<")
 puts LINE, ''
 
 loop do # Main loop
-
+  # Get moves
   res[:player][:move] = choice_to_word(player_move(res, move_prompt))
   res[:computer][:move] = moves.keys.sample.to_s.upcase
 
+  # Get results and update score
+  winner = get_winner(moves, res)
+  winner[:score] += 1
+
+  # Display output
   display_moves(name, res)
-  display_results(moves, res)
+  display_results(winner, res)
   display_score(name, res)
+
 
   # Prompt for another game
   prompt "Want to have another go? (y/n)"
