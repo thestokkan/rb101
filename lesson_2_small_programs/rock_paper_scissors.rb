@@ -1,3 +1,4 @@
+require 'pry'
 # Assignment
 # In this assignment, we'll build a ROCK PAPER SCISSORS game. The game flow
 # should go like this:
@@ -101,13 +102,19 @@ moves = {
   spock: ['SCISSORS', 'ROCK']
 }
 
-score = {
-  player: 0,
-  computer: 0
+res = {
+  player: {
+    move: '',
+    score: 0
+  },
+  computer: {
+    move: '',
+    score: 0
+  }
 }
 
-# Moves translation
-def move_to_word(input)
+# Moves input translation
+def choice_to_word(input)
   move = case input
           when '1'
             'ROCK'
@@ -133,6 +140,64 @@ def flash(msg)
   print "\r#{msg}\n\n\n"
 end
 
+def center(msg)
+  msg.center(L_LENGTH)
+end
+
+def player_move(res, move_prompt)
+  pmove = ''
+  loop do
+    puts move_prompt
+    print '>> '
+    pmove = gets.chomp
+    break if valid_input?(pmove)
+    prompt "Invalid input..."
+  end
+  pmove
+end
+
+def display_moves(name, res)
+  puts ''
+  puts center("MOVES")
+  print name
+  puts 'Computer'.rjust(L_LENGTH - name.length)
+  puts LINE
+  print res[:player][:move]
+  puts res[:computer][:move].rjust(L_LENGTH - res[:player][:move].length)
+  puts "\n\n"
+end
+
+def display_results(moves, res)
+  player = res[:player]
+  computer = res[:computer]
+
+  if moves[player[:move].downcase.to_sym].include?(computer[:move])
+    player[:score] += 1
+    puts center("#{player[:move]} beats #{computer[:move]}!")
+    flash(center(">>> YOU WIN! <<<"))
+  elsif player[:move] == computer[:move]
+    flash(center("It's a draw!"))
+  else
+    computer[:score] += 1
+    puts center("#{computer[:move]} beats #{player[:move]}!")
+    flash(center("YOU LOSE"))
+  end
+end
+
+def display_score(name, res)
+  pscore = res[:player][:score]
+  cscore = res[:computer][:score]
+
+  puts center('SCORE')
+  print name
+  puts 'Computer'.rjust(L_LENGTH - name.length)
+  puts LINE
+  print pscore
+  puts cscore.to_s.rjust(L_LENGTH - pscore.to_s.length)
+  puts LINE, ''
+end
+
+# Welcome user and get their name
 prompt "Welcome to Rock, Paper, Scissors, Lizard, Spock!"
 
 name = ''
@@ -143,59 +208,21 @@ loop do
   break unless name.empty?
 end
 
-LINE_LENGTH = name.length + 30
-LINE = '-' * LINE_LENGTH
+L_LENGTH = name.length + 30
+LINE = '-' * L_LENGTH
 
 puts '', LINE
-puts ">>>>> Let's play, #{name}! <<<<<".center(LINE_LENGTH)
+puts center(">>>>> Let's play, #{name}! <<<<<")
 puts LINE, ''
 
 loop do # Main loop
 
-  # player move
-  player_move = ''
-  loop do
-    puts move_prompt
-    print '>> '
-    player_move = gets.chomp
-    break if valid_input?(player_move)
-    prompt "Invalid input..."
-  end
+  res[:player][:move] = choice_to_word(player_move(res, move_prompt))
+  res[:computer][:move] = moves.keys.sample.to_s.upcase
 
-  # Computer 'move'
-  computer_move = %w(1 2 3 4 5).sample
-  # Convert number input to words
-  player_move = move_to_word(player_move)
-  computer_move = move_to_word(computer_move)
-
-  # Print results
-  puts '', "RESULTS".center(LINE_LENGTH)
-  print name
-  puts 'Computer'.rjust(LINE_LENGTH - name.length)
-  puts LINE
-  print player_move.upcase
-  puts computer_move.rjust(LINE_LENGTH - player_move.length), "\n\n"
-
-  # Get results
-  if moves[player_move.downcase.to_sym].include?(computer_move)
-    score[:player] += 1
-    puts "#{player_move} beats #{computer_move}!".center(LINE_LENGTH)
-    flash(">>> YOU WIN! <<<".center(LINE_LENGTH))
-  elsif player_move == computer_move
-    flash("It's a draw!".center(LINE_LENGTH))
-  else
-    score[:computer] += 1
-    puts "#{computer_move} beats #{player_move}!".center(LINE_LENGTH)
-    flash("YOU LOSE".center(LINE_LENGTH))
-  end
-
-  puts 'SCORE'.center(LINE_LENGTH)
-  print name
-  puts 'Computer'.rjust(LINE_LENGTH - name.length)
-  puts LINE
-  print score[:player]
-  puts score[:computer].to_s.rjust(LINE_LENGTH - score[:player].to_s.length)
-  puts LINE, ''
+  display_moves(name, res)
+  display_results(moves, res)
+  display_score(name, res)
 
   # Prompt for another game
   prompt "Want to have another go? (y/n)"
@@ -206,5 +233,5 @@ loop do # Main loop
 end
 
 puts '', LINE
-puts "Thanks for playing, #{name}!".center(LINE_LENGTH)
+puts center("Thanks for playing, #{name}!")
 puts LINE
