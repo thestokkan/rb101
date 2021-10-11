@@ -1,229 +1,233 @@
-# Assignment
-# In this assignment, we'll build a Rock Paper Scissors game. The game flow
-# should go like this:
-#
-#     the user makes a choice
-#     the computer makes a choice
-#     the winner is displayed
-
-# PEDAC
-
-# UNDERSTAND THE PROBLEM
-# - Input: user choice, computer choice
-# - Output: winner (user or computer)
-# - Requirements
-#   - Rules of the game: Each chooses rock, paper or scissors. Rock beats
-#     scissors, paper beats rock, and scissors beats paper. Equal choices
-#     means it's a draw.
-#   - The computer chooses at random
-# - Clarifications/notes
-#   - Prompt user for another game after each round
-#   - Validate input (integer between 1 and 3)
-#   - Need to keep track of who made which choice as well as decide the winner
-#     based on both choices.
-#   - Don't keep score (for now)
-
-# EXAMPLES/EDGE CASES
-# 1) rock, 2) paper), 3) scissors
-# User: 1; Computer: 3; Output: "Rock beats scissors => The user wins!"
-# User: 2; Computer: 3; Output: "Scissors beats paper => The computer wins!"
-# User: 1; Computer: 1; Output: "Both chose rock => It's a draw!"
-# User: potato => Output: "Inavlid input, try again."
-# User: 4 => Output: "Inavlid input, please choose 1, 2 or 3"
-# User: one => Output: "Inavlid input,  please choose 1, 2 or 3."
-
-# DATA STRUCTURE
-# Use hash to store players keys and choices as values
-
-# ALGORITHM
-# Extract logic to methods
-#   - Custom prompt
-#   - Input validation
-#   - Convert number input to choice
-#     - 1 = 'rock'
-#     - 2 = 'paper'
-#     - 3 = 'scissors'
-#   - Winner
-#     - Input: hash with players (keys) and their respective choices (values)
-#     - Output: Winner
-#     - Rules of the game
-#       - rock beats scissors
-#       - paper beats rock
-#       - scissors beats paper
-#       - Equal choice means draw
-#     - Compare choices (hash values) based on rules and return winner (key)
-# Welcome user to game and prompt for name
-# Within a loop
-#   1. Initialize variable to hold user's choice
-#   Within a loop
-#     Prompt user for input
-#     Validate input
-#     If input is valid, quit loop.
-#     If input is not valid, display error message
-#   2. Computer makes a random choice
-#   3. Apply rules to user and computer choices
-#   4. Display personalized result
-#   5. Prompt user for another game
-#     If yes => continue loop
-#     If no => quit loop
-# Print personalized 'goodbye' message
-
-# CODE
 # Clear terminal
 system("clear") || system("cls")
 
+# HELPER METHODS, VARIABLES, AND CONSTANTS
+# Formatting
+
 def prompt(message)
-  puts ">> #{message}"
+  print ">> #{message}"
 end
 
-choice_prompt = <<-MSG
->> Make your choice (1-3):
->>  1) rock
->>  2) paper
->>  3) scissors
+move_prompt = <<-MSG
+>> Make your move (1-5):
+>>  1) Rock
+>>  2) Paper
+>>  3) Scissors
+>>  4) Lizard
+>>  5) Spock
   MSG
+
+def flash(msg)
+  5.times do
+    print "\r#{msg}"
+    sleep 0.5
+    print "\r#{' ' * msg.size}"
+    sleep 0.5
+  end
+  print "\r#{msg}\n\n"
+end
+
+def center(msg)
+  msg.center(L_LENGTH)
+end
+
+def display_flash_msg(header_msg, flash_msg)
+  puts center(header_msg)
+  puts LINE, ''
+  flash center(flash_msg)
+end
+
+def display_table(header, left_row, right_row)
+  puts ''
+  puts center(header)
+  puts LINE
+  print NAME
+  puts 'Computer'.rjust(L_LENGTH - NAME.length)
+  puts LINE
+  print left_row
+  puts right_row.to_s.rjust(L_LENGTH - left_row.to_s.length)
+  puts "\n\n"
+end
+
+# Input validation
 
 def integer?(num)
   /^-?\d*$/.match(num) ? true : false
 end
 
 def valid_input?(input)
-  integer?(input) && (1..3).include?(input.to_i)
+  integer?(input) && (1..5).include?(input.to_i)
 end
 
-rps = {
-  user: { choice: '', score: 0 },
-  computer: { choice: '', score: 0 }
+# Results methods
+
+def choice_to_word(input)
+  move = case input
+         when '1'
+           'ROCK'
+         when '2'
+           'PAPER'
+         when '3'
+           'SCISSORS'
+         when '4'
+           'LIZARD'
+         when '5'
+           'SPOCK'
+         end
+  move
+end
+
+def player_move(move_prompt)
+  pmove = ''
+  loop do
+    puts move_prompt
+    prompt ""
+    pmove = gets.chomp
+    break if valid_input?(pmove)
+    prompt "Invalid input...\n"
+  end
+  pmove
+end
+
+def get_winner(moves, res)
+  player = res[:player]
+  computer = res[:computer]
+  if moves[player[:move].downcase.to_sym].include?(computer[:move])
+    winner = res[:player]
+  elsif player[:move] == computer[:move]
+    winner = ''
+  else
+    winner = res[:computer]
+  end
+  winner
+end
+
+# Display methods
+def display_results(winner, res)
+  player = res[:player]
+  computer = res[:computer]
+  if winner == player
+    res_msg = "#{player[:move]} beats #{computer[:move]}!"
+    flash_msg = ">>> YOU WIN! <<<"
+  elsif winner == computer
+    res_msg = "#{computer[:move]} beats #{player[:move]}!"
+    flash_msg = "YOU LOSE"
+  else
+    res_msg = ''
+    flash_msg = "It's a draw!"
+  end
+  display_flash_msg(res_msg, flash_msg)
+end
+
+def get_match_winner(res)
+  match_winner = ''
+  if res[:player][:score] == (2 || 3)
+    match_winner = NAME
+  elsif res[:computer][:score] == (2 || 3)
+    match_winner = 'Computer'
+  end
+  match_winner
+end
+
+def display_match_winner(match_winner)
+  if match_winner == NAME
+    flash_msg = '>>> CONGRATULATIONS! <<<'
+  else
+    flash_msg = 'Better luck next time!'
+  end
+  winner_msg = "MATCH WINNER: #{match_winner}"
+  display_flash_msg(winner_msg, flash_msg)
+end
+
+moves = {
+  rock: ['SCISSORS', 'LIZARD'],
+  paper: ['ROCK', 'SPOCK'],
+  scissors: ['PAPER', 'LIZARD'],
+  lizard: ['PAPER', 'SPOCK'],
+  spock: ['SCISSORS', 'ROCK']
 }
 
-# Choice translation
-def choice_to_word(input)
-  choice_word = case input
-                when '1'
-                  'ROCK'
-                when '2'
-                  'PAPER'
-                when '3'
-                  'SCISSORS'
-                end
-  choice_word
-end
-
-def flash(msg)
-  5.times do
-    print "\r#{msg}"
-    sleep 0.4
-    print "\r#{' ' * msg.size}"
-    sleep 0.4
-  end
-  print "\r#{msg}\n\n\n"
-end
-
-prompt "Welcome to Rock, paper, scissors!"
+## START GAME
+# Welcome user and get their name
+puts '', ">>>>> Welcome to Rock, Paper, Scissors, Lizard, Spock! <<<<<", ''
 
 name = ''
 loop do
-  prompt 'Please enter your name:'
-  print '>> '
+  prompt 'Please enter your name: '
   name = gets.chomp
   break unless name.empty?
 end
 
-LINE_LENGTH = name.length + 30
-LINE = '-' * LINE_LENGTH
+NAME = name
+L_LENGTH = NAME.length + 30
+LINE = '-' * L_LENGTH
 
 puts '', LINE
-puts ">>>>> Let's play, #{name}! <<<<<".center(LINE_LENGTH)
+puts center(">>>>> Let's play, #{NAME}! <<<<<")
 puts LINE, ''
+sleep 2
 
-loop do # Main loop
-  user = rps[:user]
-  computer = rps[:computer]
+loop do # Match loop
+  res = {
+    player: {
+      move: '',
+      score: 0
+    },
+    computer: {
+      move: '',
+      score: 0
+    }
+  }
+  match_winner = ''
+  n = 1
+  loop do # Game loop
+    # Clear terminal
+    system("clear") || system("cls")
 
-  # User choice
-  loop do
-    puts choice_prompt
-    print '>> '
-    user[:choice] = gets.chomp
-    break if valid_input?(user[:choice])
-    prompt "Invalid input..."
+    puts '', center('BEST OUT OF THREE'), ''
+    display_table('SCOREBOARD', res[:player][:score], res[:computer][:score])
+    sleep 0.7
+    puts center("----- Round #{n} -----"), ''
+
+    # Get moves
+    res[:player][:move] = choice_to_word(player_move(move_prompt))
+    res[:computer][:move] = moves.keys.sample.to_s.upcase
+
+    # Get results and update score
+    winner = get_winner(moves, res)
+    winner[:score] += 1 unless winner.empty?
+
+    # Display output
+    sleep 0.5
+    display_table('MOVES', res[:player][:move], res[:computer][:move])
+    display_results(winner, res)
+    sleep 1
+
+    match_winner = get_match_winner(res)
+
+    break unless match_winner.empty?
+    n += 1
   end
 
-  # Computer 'choice'
-  computer[:choice] = %w(1 2 3).sample
-  # Convert number input to words
-  user[:choice] = choice_to_word(user[:choice])
-  computer[:choice] = choice_to_word(computer[:choice])
+  # Clear terminal
+  system("clear") || system("cls")
+  sleep 1
 
-  # Calculate results
-  res_msg = "It's a draw!"
-  winner = ''
-  case rps[:user][:choice]
-  when 'ROCK'
-    if rps[:computer][:choice] == 'PAPER'
-      winner = rps[:computer]
-      res_msg = 'PAPER beats ROCK!'
-    elsif rps[:computer][:choice] == 'SCISSORS'
-      winner = rps[:user]
-      res_msg = 'ROCK beats SCISSORS!'
-    end
-  when 'PAPER'
-    if rps[:computer][:choice] == 'SCISSORS'
-      winner = rps[:computer]
-      res_msg = 'SCISSORS beat PAPER!'
-    elsif rps[:computer][:choice] == 'ROCK'
-      winner = rps[:user]
-      res_msg = 'PAPER beats ROCK!'
-    end
-  when 'SCISSORS'
-    if rps[:computer][:choice] == 'ROCK'
-      winner = rps[:computer]
-      res_msg = 'ROCK beats SCISSORS!'
-    elsif rps[:computer][:choice] == 'PAPER'
-      winner = rps[:user]
-      res_msg = 'SCISSORS beat PAPER!'
-    end
-  end
-
-  winner[:score] += 1 unless winner.empty?
-  results = { winner: rps.key(winner).to_s, message: res_msg }
-
-  # Print results
-  puts '', "RESULTS".center(LINE_LENGTH)
-  print name
-  puts 'Computer'.rjust(LINE_LENGTH - name.length)
+  # Display match score and winner
+  puts '', center('***** MATCH OVER *****'), ''
+  display_table('FINAL SCORE', res[:player][:score], res[:computer][:score])
+  puts ''
+  display_match_winner(match_winner)
   puts LINE
-  print user[:choice]
-  puts computer[:choice].rjust(LINE_LENGTH - user[:choice].length), "\n\n"
-
-  if results[:winner] == 'user'
-    puts results[:message].center(LINE_LENGTH)
-    msg = ">>> YOU WIN! <<<".center(LINE_LENGTH)
-  elsif results[:winner] == 'computer'
-    puts results[:message].center(LINE_LENGTH)
-    msg = "YOU LOSE".center(LINE_LENGTH)
-  else
-    msg = results[:message].center(30)
-  end
-
-  flash(msg)
-
-  puts 'SCORE'.center(LINE_LENGTH)
-  print name
-  puts 'Computer'.rjust(LINE_LENGTH - name.length)
-  puts LINE
-  print user[:score]
-  puts computer[:score].to_s.rjust(LINE_LENGTH - user[:score].to_s.length)
-  puts LINE, ''
 
   # Prompt for another game
-  prompt "Want to have another go? (y/n)"
-  print ">> "
+  sleep 1
+  prompt "Want to have another go? (y/n): "
   answer = gets.chomp.downcase
 
   break unless ['y', 'yes'].include?(answer)
 end
 
 puts '', LINE
-puts "Thanks for playing, #{name}!".center(LINE_LENGTH)
+puts center("Thanks for playing, #{NAME}!")
 puts LINE
