@@ -59,7 +59,7 @@ def valid_input?(input)
   integer?(input) && (1..5).include?(input.to_i)
 end
 
-# Results methods
+# player_dataults methods
 
 def choice_to_word(input)
   move = case input
@@ -89,41 +89,41 @@ def player_move(move_prompt)
   pmove
 end
 
-def get_winner(moves, res)
-  player = res[:player]
-  computer = res[:computer]
+def get_winner(moves, player_data)
+  player = player_data[:player]
+  computer = player_data[:computer]
   if moves[player[:move].downcase.to_sym].include?(computer[:move])
-    winner = res[:player]
+    winner = player_data[:player]
   elsif player[:move] == computer[:move]
     winner = ''
   else
-    winner = res[:computer]
+    winner = player_data[:computer]
   end
   winner
 end
 
 # Display methods
-def display_results(winner, res)
-  player = res[:player]
-  computer = res[:computer]
+def display_player_dataults(winner, player_data)
+  player = player_data[:player]
+  computer = player_data[:computer]
   if winner == player
-    res_msg = "#{player[:move]} beats #{computer[:move]}!"
+    player_data_msg = "#{player[:move]} beats #{computer[:move]}!"
     flash_msg = ">>> YOU WIN! <<<"
   elsif winner == computer
-    res_msg = "#{computer[:move]} beats #{player[:move]}!"
+    player_data_msg = "#{computer[:move]} beats #{player[:move]}!"
     flash_msg = "YOU LOSE"
   else
-    res_msg = ''
+    player_data_msg = ''
     flash_msg = "It's a draw!"
   end
-  display_flash_msg(res_msg, flash_msg)
+  display_flash_msg(player_data_msg, flash_msg)
 end
 
-def get_match_winner(res)
+def get_match_winner(player_data)
   match_winner = ''
-  if res[:player][:score] == (2 || 3)
+  if player_data[:player][:score] == (2 || 3)
     match_winner = NAME
-  elsif res[:computer][:score] == (2 || 3)
+  elsif player_data[:computer][:score] == (2 || 3)
     match_winner = 'Computer'
   end
   match_winner
@@ -168,7 +168,7 @@ puts LINE, ''
 sleep 2
 
 loop do # Match loop
-  res = {
+  player_data = {
     player: {
       move: '',
       score: 0
@@ -183,27 +183,29 @@ loop do # Match loop
   loop do # Game loop
     # Clear terminal
     system("clear") || system("cls")
+    player = player_data[:player]
+    computer = player_data[:computer]
 
     puts '', center('BEST OUT OF THREE'), ''
-    display_table('SCOREBOARD', res[:player][:score], res[:computer][:score])
+    display_table('SCOREBOARD', player[:score], computer[:score])
     sleep 0.7
     puts center("----- Round #{n} -----"), ''
 
     # Get moves
-    res[:player][:move] = choice_to_word(player_move(move_prompt))
-    res[:computer][:move] = moves.keys.sample.to_s.upcase
+    player[:move] = choice_to_word(player_move(move_prompt))
+    computer[:move] = moves.keys.sample.to_s.upcase
 
-    # Get results and update score
-    winner = get_winner(moves, res)
+    # Get player_dataults and update score
+    winner = get_winner(moves, player_data)
     winner[:score] += 1 unless winner.empty?
 
     # Display output
     sleep 0.5
-    display_table('MOVES', res[:player][:move], res[:computer][:move])
-    display_results(winner, res)
+    display_table('MOVES', player[:move], computer[:move])
+    display_player_dataults(winner, player_data)
     sleep 1
 
-    match_winner = get_match_winner(res)
+    match_winner = get_match_winner(player_data)
 
     break unless match_winner.empty?
     n += 1
@@ -215,7 +217,7 @@ loop do # Match loop
 
   # Display match score and winner
   puts '', center('***** MATCH OVER *****'), ''
-  display_table('FINAL SCORE', res[:player][:score], res[:computer][:score])
+  display_table('FINAL SCORE', player[:score], computer[:score])
   puts ''
   display_match_winner(match_winner)
   puts LINE
