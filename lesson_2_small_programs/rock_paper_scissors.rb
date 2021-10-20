@@ -59,7 +59,7 @@ def valid_input?(input)
   integer?(input) && (1..5).include?(input.to_i)
 end
 
-# player_dataults methods
+# results methods
 
 def choice_to_word(input)
   move = case input
@@ -103,20 +103,20 @@ def get_winner(moves, player_data)
 end
 
 # Display methods
-def display_player_dataults(winner, player_data)
+def display_results(winner, player_data)
   player = player_data[:player]
   computer = player_data[:computer]
   if winner == player
-    player_data_msg = "#{player[:move]} beats #{computer[:move]}!"
+    res_msg = "#{player[:move]} beats #{computer[:move]}!"
     flash_msg = ">>> YOU WIN! <<<"
   elsif winner == computer
-    player_data_msg = "#{computer[:move]} beats #{player[:move]}!"
+    res_msg = "#{computer[:move]} beats #{player[:move]}!"
     flash_msg = "YOU LOSE"
   else
-    player_data_msg = ''
+    res_msg = ''
     flash_msg = "It's a draw!"
   end
-  display_flash_msg(player_data_msg, flash_msg)
+  display_flash_msg(res_msg, flash_msg)
 end
 
 def get_match_winner(player_data)
@@ -195,14 +195,14 @@ loop do # Match loop
     player[:move] = choice_to_word(player_move(move_prompt))
     computer[:move] = moves.keys.sample.to_s.upcase
 
-    # Get player_dataults and update score
+    # Get results and update score
     winner = get_winner(moves, player_data)
     winner[:score] += 1 unless winner.empty?
 
     # Display output
     sleep 0.5
     display_table('MOVES', player[:move], computer[:move])
-    display_player_dataults(winner, player_data)
+    display_results(winner, player_data)
     sleep 1
 
     match_winner = get_match_winner(player_data)
